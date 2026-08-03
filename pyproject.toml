@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scigantic-mcp"
+version = "0.1.0"
+description = "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT-0" }
+authors = [{ name = "Scigantic" }]
+keywords = ["mcp", "model-context-protocol", "datasets", "open-data", "schema-card", "bioinformatics", "earth-observation"]
+classifiers = [
+  "License :: OSI Approved :: MIT No Attribution License (MIT-0)",
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+
+# mcp 2.0 removed `mcp.server.fastmcp`, so an open-ended floor silently installs
+# an SDK this package cannot import. Both bounds are load-bearing.
+dependencies = [
+  "mcp>=2,<3",
+  "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://scigantic.com"
+Repository = "https://github.com/Scigantic/scigantic-mcp"
+Documentation = "https://scigantic.com/blog/scigantic-mcp-server"
+Issues = "https://github.com/Scigantic/scigantic-mcp/issues"
+
+[project.optional-dependencies]
+test = ["pytest>=7", "pytest-asyncio>=0.23"]
+
+# Console-script entry point. This is the binary Kiro launches from mcp.json
+# (e.g. "command": "/path/to/.venv/bin/scigantic-mcp") and what `uvx scigantic-mcp`
+# resolves to.
+[project.scripts]
+scigantic-mcp = "scigantic_mcp.server:main"
+
+[tool.setuptools]
+packages = ["scigantic_mcp"]
