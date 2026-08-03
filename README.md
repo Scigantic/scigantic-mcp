@@ -123,8 +123,8 @@ all under SDK 2.x, which is what `test_server_import.py` now guards against.
 
 - **Richer discovery for agents** — structured tool outputs and MCP *resources*
   (attach an archive + its schema card as durable context).
-- Upstream inclusion as `life-sciences-scigantic` in `aws-samples/sample-kiro-power-life-sciences`
-  as `life-sciences-scigantic`.
+- Upstream inclusion as `life-sciences-scigantic` in
+  [`aws-samples/sample-kiro-power-life-sciences`](https://github.com/aws-samples/sample-kiro-power-life-sciences).
 - **Hosted compute is intentionally not exposed here.** Scigantic's notebooks are
   interactive (a JupyterLab URL a human opens); handing an external agent that URL
   is a dead end. The agent-to-agent path is `get_data_access` — the caller runs the
