@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scigantic-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards"
 readme = "README.md"
 requires-python = ">=3.10"
