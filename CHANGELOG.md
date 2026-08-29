@@ -13,6 +13,9 @@ Packaging and metadata only. No change to tool behaviour, arguments, or output.
   arguments are the stable surface.
 - README: fixed a duplicated clause in the roadmap, left over from removing an
   internal document reference before this repository was made public.
+- README: added the `mcp-name` ownership marker the official MCP Registry
+  (registry.modelcontextprotocol.io) checks for on PyPI packages, ahead of
+  publishing there as `io.github.Scigantic/scigantic-mcp`.
 
 ## 0.1.0
 

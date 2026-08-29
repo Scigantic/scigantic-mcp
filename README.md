@@ -1,5 +1,7 @@
 # scigantic-mcp
 
+<!-- mcp-name: io.github.Scigantic/scigantic-mcp -->
+
 A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the
 **Scigantic catalog of public scientific data archives** to any MCP client.
 
