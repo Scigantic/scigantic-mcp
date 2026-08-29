@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Scigantic/scigantic-mcp",
+  "title": "Scigantic",
+  "description": "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards",
+  "repository": {
+    "url": "https://github.com/Scigantic/scigantic-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "scigantic-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.scigantic.com/mcp"
+    }
+  ]
+}
