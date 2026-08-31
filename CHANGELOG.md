@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.2.0
+
+Type-checking enforcement and a stale-header fix. No change to tool names,
+arguments, or MCP-level behaviour; the HTTP `User-Agent` sent to the Scigantic
+API does change (see below), which is why this is a minor bump rather than a
+patch the way 0.1.1's pure-metadata change was.
+
+- `USER_AGENT` in `client.py` was a hardcoded literal, `"scigantic-mcp/0.1
+  (+https://scigantic.com)"`, already stale since the package moved past
+  0.1.x. It is now built from the package's own `__version__` (`from . import
+  __version__`), the same source `server.py`'s `serverInfo.version` already
+  reads, so there is exactly one version-of-truth. A new test asserts the
+  header actually carries the current version, so this can't silently go
+  stale again.
+- Added a `py.typed` marker and verified (via a real `python -m build` +
+  `unzip -l`) that it ships in the built wheel, plus `[tool.setuptools.package-data]`
+  to make sure of it.
+- Added `mypy --strict` as a CI job (`typecheck`, checking the `scigantic_mcp`
+  package only, matching sibling `scigantic-pubchem`'s own `mypy src/...`
+  scope — the test suite itself is not part of that gate). The code was
+  already fully type-hinted; the only finding was `_backoff()` returning
+  `Any` because typeshed types a non-literal `int ** int` loosely. Fixed by
+  using a `2.0` float base instead of `2`.
+- Added `Typing :: Typed` and per-version `Programming Language :: Python ::
+  3.1x` classifiers so the new PyPI Python-version badge (see below) and the
+  typed-package marker actually show up on PyPI, matching `scigantic-pubchem`.
+- README: added CI, PyPI version, PyPI Python-version, and license badges,
+  matching `scigantic-pubchem`'s existing badge row. This package had none
+  before.
+- CI and publish matrices widened from 3.10-3.13 to 3.10-3.14, matching
+  `scigantic-pubchem`. Verified first that the `mcp` SDK's own PyPI
+  classifiers list 3.14 support, and confirmed a real `mcp>=2,<3` install
+  plus `mypy --strict` and the full test suite pass locally under 3.14
+  before widening the matrix, rather than copying pubchem's matrix blindly.
+
 ## 0.1.1
 
 Packaging and metadata only. No change to tool behaviour, arguments, or output.

@@ -6,4 +6,4 @@ Scigantic is the cross-domain launchpad: 5,000+ curated public archives with
 LLM-ready schema cards, searchable in one place.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
