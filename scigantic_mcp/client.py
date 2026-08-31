@@ -16,11 +16,16 @@ from typing import Any, Dict, Optional
 
 import httpx
 
+from . import __version__
+
 DEFAULT_BASE_URL = "https://api.scigantic.com"
 # The API derives its (default) tenant from the request Origin; pinning it to
 # scigantic.com keeps this connector on the main public catalog.
 DEFAULT_ORIGIN = "https://scigantic.com"
-USER_AGENT = "scigantic-mcp/0.1 (+https://scigantic.com)"
+# Built from the installed package's own __version__ (same source server.py's
+# serverInfo.version reads) so this can't silently drift out of date the way
+# the old hardcoded "0.1" literal did once the package moved past 0.1.x.
+USER_AGENT = f"scigantic-mcp/{__version__} (+https://scigantic.com)"
 
 _RETRYABLE_STATUS = {429, 500, 502, 503, 504}
 
@@ -98,7 +103,10 @@ class ScigateClient:
     @staticmethod
     def _backoff(attempt: int) -> float:
         # 0.5s, 1s, 2s — capped exponential backoff.
-        return min(0.5 * (2 ** attempt), 4.0)
+        # 2.0 (not 2) as the base: typeshed types int.__pow__ as returning Any
+        # for a non-literal exponent (an int ** int can be int or float
+        # depending on sign), which otherwise infects this whole expression.
+        return min(0.5 * (2.0 ** attempt), 4.0)
 
     @staticmethod
     def _handle_response(method: str, path: str, resp: httpx.Response) -> Any:

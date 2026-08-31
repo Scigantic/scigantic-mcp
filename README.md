@@ -1,5 +1,16 @@
 # scigantic-mcp
 
+<p align="center">
+    <a href="https://github.com/Scigantic/scigantic-mcp/actions/workflows/ci.yml">
+        <img alt="CI" src="https://github.com/Scigantic/scigantic-mcp/actions/workflows/ci.yml/badge.svg" /></a>
+    <a href="https://pypi.org/project/scigantic-mcp/">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/scigantic-mcp" /></a>
+    <a href="https://pypi.org/project/scigantic-mcp/">
+        <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/scigantic-mcp" /></a>
+    <a href="https://github.com/Scigantic/scigantic-mcp/blob/main/LICENSE">
+        <img alt="License" src="https://img.shields.io/github/license/Scigantic/scigantic-mcp" /></a>
+</p>
+
 <!-- mcp-name: io.github.Scigantic/scigantic-mcp -->
 
 A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the

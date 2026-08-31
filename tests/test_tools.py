@@ -202,6 +202,33 @@ def test_client_raises_notfound():
     asyncio.run(body())
 
 
+def test_user_agent_carries_the_real_package_version():
+    """USER_AGENT used to be the literal string "scigantic-mcp/0.1 (...)",
+    already stale once the package moved past 0.1.x. It must now be built
+    from the installed __version__, so a request's actual header can't
+    silently drift out of sync with a version bump again."""
+    from scigantic_mcp import __version__
+    from scigantic_mcp.client import USER_AGENT
+
+    assert USER_AGENT == f"scigantic-mcp/{__version__} (+https://scigantic.com)"
+    assert __version__ != "0.1"  # guards against the header regressing to the old literal
+
+    seen = {}
+
+    def capture(request: httpx.Request) -> httpx.Response:
+        seen["user-agent"] = request.headers.get("user-agent")
+        return httpx.Response(200, json={"success": True, "data": []})
+
+    async def body():
+        c = make_client(capture)
+        await c.get_json("/api/archives", {"search": "x"})
+        await c.aclose()
+    asyncio.run(body())
+
+    assert seen["user-agent"] == USER_AGENT
+    assert __version__ in seen["user-agent"]
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):
