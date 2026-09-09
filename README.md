@@ -27,6 +27,14 @@ understand a dataset's structure *before* downloading anything.
 It is **discovery-only and zero-config** — every tool calls public, read-only
 Scigantic endpoints, so there is no API key to set up.
 
+Since 0.3.0 it also carries six `surechembl_*` tools for **patent chemistry**,
+backed by [SureChEMBL](https://www.surechembl.org/) (EMBL-EBI, 31M compounds
+extracted from 45M patents) through the
+[scigantic-surechembl](https://github.com/Scigantic/scigantic-surechembl)
+library: look a compound up by any identifier, list the patents that mention
+it, read a patent, list the structures it discloses, search patents with Solr
+syntax, and run structure searches. Also public, read-only, no key.
+
 Requires Python 3.10+ and MCP SDK 2.x.
 
 > **Prefer the hosted server if your client speaks HTTP.** Scigantic also runs a
@@ -45,6 +53,21 @@ Requires Python 3.10+ and MCP SDK 2.x.
 | `get_data_access(id, language?)` | How to load the dataset in **your own** environment: storage location + copy-paste code snippets. |
 | `list_archive_files(id, limit?)` | A sample of the files/objects in the archive. |
 
+### Patent chemistry (SureChEMBL)
+
+| Tool | What it does |
+|------|--------------|
+| `surechembl_compound(identifier)` | A compound by SureChEMBL id, ChEMBL id, `pubchem:CID`, `drugbank:ID`, InChIKey, SMILES or name: structure, properties, cross-references, patent count. |
+| `surechembl_patents_for_compound(identifier, limit?)` | The patents in which the compound was found, with the total. |
+| `surechembl_patent(doc_id, include_text?)` | A patent's bibliography, abstract, family, CPC codes, extracted-compound count, and optionally its claims and description. |
+| `surechembl_patent_chemistry(doc_id, limit?)` | Every structure SureChEMBL extracted from the patent. |
+| `surechembl_search_patents(query, limit?)` | Full-text patent search with Solr field syntax (`ttl:`, `asg:`, `pdyear:`, `cpc:`, ...). |
+| `surechembl_structure_search(structure, mode?, limit?)` | Similarity, substructure, identical or connectivity search over 31M compounds. |
+
+Identifiers are preserved verbatim in the output (SureChEMBL's attribution terms
+ask that SCHEMBL ids and publication numbers be kept), and each result links to
+surechembl.org. SureChEMBL data is CC BY 4.0.
+
 ## Prompts (guided workflows)
 
 These surface as slash commands in Claude Code (`/mcp__scigantic__<name>`):
@@ -53,6 +76,7 @@ These surface as slash commands in Claude Code (`/mcp__scigantic__<name>`):
 |--------|--------------|
 | `explore_dataset(topic)` | Search → inspect schema cards → recommend the best dataset → offer load code. |
 | `start_analysis(archive_id, goal?)` | Pull schema card + data-access snippet for an archive and outline an analysis plan. |
+| `patent_landscape(compound)` | Resolve a compound, count and list its patents, summarize assignees, years and CPC areas, read the key documents. |
 
 ## Install & register in Kiro
 

@@ -24,8 +24,14 @@ EXPECTED_TOOLS = {
     "get_schema_card",
     "list_archive_files",
     "get_data_access",
+    "surechembl_compound",
+    "surechembl_patents_for_compound",
+    "surechembl_patent",
+    "surechembl_patent_chemistry",
+    "surechembl_search_patents",
+    "surechembl_structure_search",
 }
-EXPECTED_PROMPTS = {"explore_dataset", "start_analysis"}
+EXPECTED_PROMPTS = {"explore_dataset", "start_analysis", "patent_landscape"}
 
 
 def test_server_module_imports():

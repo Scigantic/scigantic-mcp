@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scigantic-mcp"
-version = "0.2.0"
-description = "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards"
+version = "0.3.0"
+description = "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards, plus SureChEMBL patent chemistry tools"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT-0" }
 authors = [{ name = "Scigantic" }]
-keywords = ["mcp", "model-context-protocol", "datasets", "open-data", "schema-card", "bioinformatics", "earth-observation"]
+keywords = ["mcp", "model-context-protocol", "datasets", "open-data", "schema-card", "bioinformatics", "earth-observation", "surechembl", "patents", "cheminformatics"]
 classifiers = [
   "License :: OSI Approved :: MIT No Attribution License (MIT-0)",
   "Programming Language :: Python :: 3",
@@ -29,6 +29,8 @@ classifiers = [
 dependencies = [
   "mcp>=2,<3",
   "httpx>=0.27",
+  # The surechembl_* tools. Ceiling at the next major, like the rest.
+  "scigantic-surechembl>=0.2,<1",
 ]
 
 [project.urls]

@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.3.0
+
+Six SureChEMBL patent-chemistry tools and one prompt, backed by the
+`scigantic-surechembl` library (new dependency, `>=0.2,<1`; it brings only
+`requests`).
+
+- `surechembl_compound(identifier)`: SureChEMBL id, ChEMBL id, `pubchem:CID`,
+  `drugbank:ID`, InChIKey, SMILES or name in; structure, properties, UniChem
+  cross-references and patent count out. Bare digits are read as a SureChEMBL
+  id, so a PubChem CID must be prefixed.
+- `surechembl_patents_for_compound(identifier, limit)`: the union over every
+  SureChEMBL id the identifier maps to, with per-id totals stated, since a
+  structure can sit under more than one id.
+- `surechembl_patent(doc_id, include_text)`: bibliography and abstract by
+  default; claims and description (each capped at 12,000 characters) on
+  request.
+- `surechembl_patent_chemistry(doc_id, limit)`, `surechembl_search_patents(
+  query, limit)` (Solr syntax passed through; a Solr syntax error is returned
+  as its first line, not its grammar dump), `surechembl_structure_search(
+  structure, mode, limit)` (similarity hits sorted by score client-side, since
+  the server does not; substructure queries under 5 atoms are refused by the
+  library before anything is sent).
+- Prompt `patent_landscape(compound)`.
+- All tool calls run the synchronous library in a worker thread; errors come
+  back as `Error: ...` text, never as exceptions, matching the catalog tools.
+- The hosted remote at `api.scigantic.com/mcp` is a separate TypeScript
+  implementation and does not yet carry these tools; see the Scigantic repo.
+
 ## 0.2.0
 
 Type-checking enforcement and a stale-header fix. No change to tool names,

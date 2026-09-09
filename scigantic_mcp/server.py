@@ -14,7 +14,7 @@ from typing import Optional
 
 from mcp.server import MCPServer
 
-from . import __version__, tools
+from . import __version__, surechembl, tools
 from .client import ScigateClient
 
 mcp = MCPServer(
@@ -27,7 +27,11 @@ mcp = MCPServer(
         "Unlike single-domain database servers, it spans genomics, proteomics, structural "
         "biology, imaging, earth observation and more, and ships an LLM-ready 'schema card' "
         "for each dataset. Use search_archives to find datasets across domains, then "
-        "get_schema_card to understand structure before analysis."
+        "get_schema_card to understand structure before analysis. "
+        "The surechembl_* tools cover patent chemistry from SureChEMBL (EMBL-EBI): look a "
+        "compound up by any identifier, list the patents that mention it, read a patent's "
+        "bibliography and text, list the structures extracted from it, search patents by Solr "
+        "query, and run similarity or substructure searches over 31 million compounds."
     ),
 )
 
@@ -107,6 +111,92 @@ async def get_data_access(id: str, language: Optional[str] = None) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SureChEMBL patent chemistry (EMBL-EBI), via the scigantic-surechembl library.
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool()
+async def surechembl_compound(identifier: str) -> str:
+    """Look up a compound in SureChEMBL, EMBL-EBI's database of chemistry extracted from
+    patents, by any identifier, and report its structure, properties, cross-references
+    (ChEMBL, PubChem, DrugBank, ChEBI, PDB) and how many patents mention it.
+
+    Args:
+        identifier: A SureChEMBL id ("SCHEMBL1353" or "1353"), a ChEMBL id ("CHEMBL25"),
+            a PubChem CID as "pubchem:2244", a DrugBank id as "drugbank:DB00945", a standard
+            InChIKey, a SMILES, or a chemical name ("aspirin").
+    """
+    return await surechembl.surechembl_compound(identifier)
+
+
+@mcp.tool()
+async def surechembl_patents_for_compound(identifier: str, limit: int = 20) -> str:
+    """List the patents in which a compound was found (SureChEMBL). Accepts the same identifier
+    forms as surechembl_compound. Aspirin is in ~700,000 documents, so read the total and
+    narrow with surechembl_search_patents when it is large.
+
+    Args:
+        identifier: SureChEMBL id, ChEMBL id, "pubchem:CID", InChIKey, SMILES, or name.
+        limit: Max patents to list (default 20, max 200).
+    """
+    return await surechembl.surechembl_patents_for_compound(identifier, limit=limit)
+
+
+@mcp.tool()
+async def surechembl_patent(doc_id: str, include_text: bool = False) -> str:
+    """A patent document from SureChEMBL: title, dates, applicants, inventors, assignees, CPC
+    codes, family, number of extracted compounds, abstract, and (optionally) the claims and
+    description text.
+
+    Args:
+        doc_id: Publication number with kind code, e.g. "US-10000000-B2", "WO2016144528A1",
+            "EP-3268771-B1".
+        include_text: Also return the claims and description (can be long). Default false.
+    """
+    return await surechembl.surechembl_patent(doc_id, include_text=include_text)
+
+
+@mcp.tool()
+async def surechembl_patent_chemistry(doc_id: str, limit: int = 50) -> str:
+    """Every compound SureChEMBL extracted from a patent (from its text, images and MOL
+    attachments): SCHEMBL id, name, SMILES, InChIKey, formula, weight.
+
+    Args:
+        doc_id: Publication number with kind code, e.g. "US-5399578-A".
+        limit: Max compounds to list (default 50, max 500).
+    """
+    return await surechembl.surechembl_patent_chemistry(doc_id, limit=limit)
+
+
+@mcp.tool()
+async def surechembl_search_patents(query: str, limit: int = 20) -> str:
+    """Full-text patent search over SureChEMBL with Solr syntax. Plain terms search all text;
+    field prefixes narrow: ttl (title), ab (abstract), clm (claims), desc, asg (assignee),
+    inv (inventor), pdyear, cpc, ic (IPCR), fam (family id). Quote publication numbers:
+    pn:"US-10000000-B2". Combine with AND/OR/NOT.
+
+    Args:
+        query: e.g. 'ttl:kinase AND asg:novartis AND pdyear:2024'.
+        limit: Max patents to list (default 20, max 200).
+    """
+    return await surechembl.surechembl_search_patents(query, limit=limit)
+
+
+@mcp.tool()
+async def surechembl_structure_search(structure: str, mode: str = "similarity", limit: int = 20) -> str:
+    """Search SureChEMBL's 31 million patent compounds by chemical structure.
+
+    Args:
+        structure: A SMILES.
+        mode: "similarity" (Tanimoto, default), "substructure" (needs at least 5 atoms; the
+            server caps results at 10,000), "identical" (all features must match), or
+            "connectivity" (same skeleton, any stereo/isotopes).
+        limit: Max hits (default 20, max 500).
+    """
+    return await surechembl.surechembl_structure_search(structure, mode=mode, limit=limit)
+
+
+# ---------------------------------------------------------------------------
 # Prompts — guided workflows. In Claude Code these surface as slash commands
 # (/mcp__scigantic__explore_dataset, /mcp__scigantic__start_analysis).
 # ---------------------------------------------------------------------------
@@ -138,6 +228,21 @@ def start_analysis(archive_id: str, goal: str = "") -> str:
         "3. Propose a concrete analysis plan and the initial code to load and explore the data"
         + (f", working toward: {goal}" if goal else "")
         + "."
+    )
+
+
+@mcp.prompt()
+def patent_landscape(compound: str) -> str:
+    """Map the patent landscape of a compound: who patents it, since when, in what context."""
+    return (
+        f"Map the patent landscape for the compound: {compound}\n\n"
+        f'1. Call surechembl_compound("{compound}") to confirm the structure, its SCHEMBL id(s) and the total patent count.\n'
+        "2. Call surechembl_patents_for_compound with a limit of 100. If the total is much larger, narrow with "
+        "surechembl_search_patents using asg:/pdyear:/cpc: filters.\n"
+        "3. Summarize: number of documents, the leading assignees, the publication-year range, and the dominant "
+        "CPC areas. Name representative documents by publication number.\n"
+        "4. For the 1-2 most relevant documents, call surechembl_patent to read the abstract and claims, and "
+        "surechembl_patent_chemistry to see what other structures they disclose."
     )
 
 
