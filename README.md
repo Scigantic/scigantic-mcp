@@ -12,6 +12,7 @@
 </p>
 
 <!-- mcp-name: io.github.Scigantic/scigantic-mcp -->
+<!-- mcp-name: com.scigantic/mcp -->
 
 A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the
 **Scigantic catalog of public scientific data archives** to any MCP client.
@@ -39,7 +40,8 @@ Requires Python 3.10+ and MCP SDK 2.x.
 
 > **Prefer the hosted server if your client speaks HTTP.** Scigantic also runs a
 > remote MCP server at `https://api.scigantic.com/mcp` (no auth, nothing to
-> install, and it carries two extra tools):
+> install, and it carries five extra tools: `search`, `fetch`,
+> `get_sample_notebook`, `lookup_paper` and `list_compute_tiers`):
 > `claude mcp add --transport http scigantic https://api.scigantic.com/mcp`.
 > This package exists for clients that launch **stdio** servers, such as Kiro.
 

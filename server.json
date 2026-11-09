@@ -1,18 +1,28 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.Scigantic/scigantic-mcp",
+  "name": "com.scigantic/mcp",
   "title": "Scigantic",
-  "description": "MCP server for the Scigantic catalog of public scientific data archives, with LLM-ready schema cards, plus SureChEMBL patent chemistry tools",
+  "description": "Search public scientific datasets and read schema cards that describe their files, columns and rows",
+  "websiteUrl": "https://scigantic.com",
   "repository": {
     "url": "https://github.com/Scigantic/scigantic-mcp",
     "source": "github"
   },
-  "version": "0.3.0",
+  "icons": [
+    {
+      "src": "https://scigantic.com/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
+  "version": "0.3.1",
   "packages": [
     {
       "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
       "identifier": "scigantic-mcp",
-      "version": "0.3.0",
+      "version": "0.3.1",
+      "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
       }
