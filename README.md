@@ -20,7 +20,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes
 It is built to drop into **[Kiro for Life Sciences](https://github.com/aws-samples/sample-kiro-power-life-sciences)**
 alongside its domain database servers. Where each Kiro server wraps one domain's
 APIs (genomics, proteomics, structural, …), Scigantic is the **cross-domain
-launchpad**: 5,000+ curated public archives spanning every domain, each with an
+launchpad**: about 6,900 curated public archives spanning every domain, each with an
 LLM-ready **schema card** (file format, columns, sample rows/headers, inlined
 READMEs/data dictionaries, and a copy-paste starter cell) so an agent can
 understand a dataset's structure *before* downloading anything.
@@ -36,12 +36,18 @@ library: look a compound up by any identifier, list the patents that mention
 it, read a patent, list the structures it discloses, search patents with Solr
 syntax, and run structure searches. Also public, read-only, no key.
 
+> **Known issue (November 2026):** SureChEMBL changed its public API, and the
+> six `surechembl_*` tools currently return 404 or 405 errors. The catalog tools
+> are unaffected. A fix will follow in a later release.
+
 Requires Python 3.10+ and MCP SDK 2.x.
 
 > **Prefer the hosted server if your client speaks HTTP.** Scigantic also runs a
 > remote MCP server at `https://api.scigantic.com/mcp` (no auth, nothing to
 > install, and it carries five extra tools: `search`, `fetch`,
 > `get_sample_notebook`, `lookup_paper` and `list_compute_tiers`):
+> add `https://api.scigantic.com/mcp` as a streamable HTTP server in your client
+> (Cursor, VS Code, Windsurf and others), or run
 > `claude mcp add --transport http scigantic https://api.scigantic.com/mcp`.
 > This package exists for clients that launch **stdio** servers, such as Kiro.
 

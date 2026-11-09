@@ -12,6 +12,9 @@ Metadata only. No change to tools, prompts or arguments.
   `list_compute_tiers`), not two. The 0.3.0 note below that the hosted server
   lacks the SureChEMBL tools is out of date: it now exposes all six.
 - `server.json` and `glama.json` added for directory listings.
+- README catalog size updated to about 6,900 archives, and a known-issue note
+  added: SureChEMBL changed its API, so the six `surechembl_*` tools fail
+  until a later release. Their live tests are skipped for now.
 
 ## 0.3.0
 
