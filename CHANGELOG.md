@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.1
+
+Metadata only. No change to tools, prompts or arguments.
+
+- README carries a second registry marker, `mcp-name: com.scigantic/mcp`,
+  so the package can be listed in the official MCP Registry under the
+  `com.scigantic` namespace.
+- README now says the hosted server at `api.scigantic.com/mcp` has five tools
+  this package lacks (`search`, `fetch`, `get_sample_notebook`, `lookup_paper`,
+  `list_compute_tiers`), not two. The 0.3.0 note below that the hosted server
+  lacks the SureChEMBL tools is out of date: it now exposes all six.
+- `server.json` and `glama.json` added for directory listings.
+
 ## 0.3.0
 
 Six SureChEMBL patent-chemistry tools and one prompt, backed by the
