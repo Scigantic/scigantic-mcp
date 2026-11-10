@@ -43,7 +43,7 @@ Documentation = "https://scigantic.com/blog/scigantic-mcp-server"
 Issues = "https://github.com/Scigantic/scigantic-mcp/issues"
 
 [project.optional-dependencies]
-test = ["pytest>=7", "pytest-asyncio>=0.23", "mypy>=1.10"]
+test = ["pytest>=7", "pytest-asyncio>=0.23", "pytest-rerunfailures>=14", "mypy>=1.10"]
 
 # Console-script entry point. This is the binary Kiro launches from mcp.json
 # (e.g. "command": "/path/to/.venv/bin/scigantic-mcp") and what `uvx scigantic-mcp`
