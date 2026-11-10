@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.3.2
+
+The six `surechembl_*` tools work again. SureChEMBL replaced its REST API
+in November 2026, and every endpoint the tools reached through
+scigantic-surechembl 0.3 returned 404 or 405. No tool, argument or prompt
+was added, removed or renamed.
+
+- Dependency raised to `scigantic-surechembl[names]>=0.4,<1`, the port to
+  the new API. The `names` extra brings scigantic-pubchem: SureChEMBL no
+  longer has a name lookup, so a chemical name passed to
+  `surechembl_compound` or `surechembl_patents_for_compound` is resolved
+  by PubChem to a structure and then by UniChem to SureChEMBL ids.
+- `surechembl_patent` no longer prints CPC codes, citation counts or
+  legal-event counts, which the new API does not return (they would have
+  read as zero); it adds IPC codes and priority claims where the record
+  has them, and its compound count is now "compounds named in the text".
+- `surechembl_patent_chemistry` now lists the compounds SureChEMBL's
+  text-mining finds in the patent text; structures that appear only in
+  images or MOL attachments are no longer included, and the output says
+  so. Counts are lower than before (US-5399578-A: about 450, was 986).
+- `surechembl_search_patents` states that only US, EP, WO, JP and CN
+  publications are searched, which the new API enforces.
+- Tool descriptions and the `patent_landscape` prompt updated to match
+  (the prompt now suggests `cpc:` filters in the search tool for CPC
+  areas, since documents no longer carry CPC codes).
+- The SureChEMBL live tests run again; the module-level skip is removed
+  and the known-issue note is gone from the README.
+
 ## 0.3.1
 
 Metadata only. No change to tools, prompts or arguments.

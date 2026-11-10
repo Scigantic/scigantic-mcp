@@ -30,7 +30,7 @@ mcp = MCPServer(
         "get_schema_card to understand structure before analysis. "
         "The surechembl_* tools cover patent chemistry from SureChEMBL (EMBL-EBI): look a "
         "compound up by any identifier, list the patents that mention it, read a patent's "
-        "bibliography and text, list the structures extracted from it, search patents by Solr "
+        "bibliography and text, list the compounds named in it, search patents by Solr "
         "query, and run similarity or substructure searches over 31 million compounds."
     ),
 )
@@ -144,9 +144,9 @@ async def surechembl_patents_for_compound(identifier: str, limit: int = 20) -> s
 
 @mcp.tool()
 async def surechembl_patent(doc_id: str, include_text: bool = False) -> str:
-    """A patent document from SureChEMBL: title, dates, applicants, inventors, assignees, CPC
-    codes, family, number of extracted compounds, abstract, and (optionally) the claims and
-    description text.
+    """A patent document from SureChEMBL: title, dates, applicants, inventors, assignees,
+    family, priority claims, number of compounds named in the text, abstract, and (optionally)
+    the claims and description text.
 
     Args:
         doc_id: Publication number with kind code, e.g. "US-10000000-B2", "WO2016144528A1",
@@ -158,8 +158,9 @@ async def surechembl_patent(doc_id: str, include_text: bool = False) -> str:
 
 @mcp.tool()
 async def surechembl_patent_chemistry(doc_id: str, limit: int = 50) -> str:
-    """Every compound SureChEMBL extracted from a patent (from its text, images and MOL
-    attachments): SCHEMBL id, name, SMILES, InChIKey, formula, weight.
+    """The compounds SureChEMBL's text-mining finds named in a patent's text: SCHEMBL id,
+    name, SMILES, InChIKey, formula, weight. Structures that appear only in images or MOL
+    attachments are not included.
 
     Args:
         doc_id: Publication number with kind code, e.g. "US-5399578-A".
@@ -173,7 +174,8 @@ async def surechembl_search_patents(query: str, limit: int = 20) -> str:
     """Full-text patent search over SureChEMBL with Solr syntax. Plain terms search all text;
     field prefixes narrow: ttl (title), ab (abstract), clm (claims), desc, asg (assignee),
     inv (inventor), pdyear, cpc, ic (IPCR), fam (family id). Quote publication numbers:
-    pn:"US-10000000-B2". Combine with AND/OR/NOT.
+    pn:"US-10000000-B2". Combine with AND/OR/NOT. Only US, EP, WO, JP and CN publications are
+    searchable.
 
     Args:
         query: e.g. 'ttl:kinase AND asg:novartis AND pdyear:2024'.
@@ -239,8 +241,9 @@ def patent_landscape(compound: str) -> str:
         f'1. Call surechembl_compound("{compound}") to confirm the structure, its SCHEMBL id(s) and the total patent count.\n'
         "2. Call surechembl_patents_for_compound with a limit of 100. If the total is much larger, narrow with "
         "surechembl_search_patents using asg:/pdyear:/cpc: filters.\n"
-        "3. Summarize: number of documents, the leading assignees, the publication-year range, and the dominant "
-        "CPC areas. Name representative documents by publication number.\n"
+        "3. Summarize: number of documents, the leading assignees and the publication-year range; where it helps, "
+        "count documents per CPC area with surechembl_search_patents cpc: filters. Name representative documents "
+        "by publication number.\n"
         "4. For the 1-2 most relevant documents, call surechembl_patent to read the abstract and claims, and "
         "surechembl_patent_chemistry to see what other structures they disclose."
     )

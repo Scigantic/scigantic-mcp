@@ -7,17 +7,11 @@ asyncio.run(), like test_tools.py.
 
 import asyncio
 import sys
-
-import pytest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scigantic_mcp import surechembl as S  # noqa: E402
-
-# SureChEMBL changed its public API in late 2026; every endpoint these tests
-# hit now returns 404 or 405. Re-enable once scigantic-surechembl is updated.
-pytestmark = pytest.mark.skip(reason="SureChEMBL API changed; tools broken until scigantic-surechembl is updated")
 
 
 def run(coro):
@@ -52,20 +46,27 @@ def test_patent_document_and_text_toggle():
     assert "RAYTHEON" in short and "Abstract:" in short and "Claims:" not in short
     full = run(S.surechembl_patent("US-10000000-B2", include_text=True))
     assert "Claims:" in full and "What is claimed" in full and "Description:" in full
+    assert "Family: 55456961" in short and "Compounds named in the text: 0" in short
+    assert "PDF: https://www.surechembl.org/api/patent/pdf/US-10000000-B2" in short
+    assert "CPC:" not in short and "Citations" not in short  # gone from the API, not shown as zero
     assert "has no document" in run(S.surechembl_patent("US-99999999999-B2"))
     assert run(S.surechembl_patent("notanumber")).startswith("Error:")
 
 
 def test_patent_chemistry_lists_and_truncates():
     out = run(S.surechembl_patent_chemistry("US-5399578-A", limit=3))
-    assert out.startswith("986 compound(s) extracted")
+    head = out.splitlines()[0]
+    n = int(head.split()[0].replace(",", ""))
+    assert n > 300 and "named in the text of US-5399578-A" in head
+    assert "images or attachments are not included" in head
     assert out.count("SCHEMBL") == 3
-    assert "983 more" in out
+    assert f"{n - 3:,} more" in out
+    assert "found no compounds" in run(S.surechembl_patent_chemistry("US-10000000-B2"))
 
 
 def test_search_patents_solr_and_errors():
     out = run(S.surechembl_search_patents("ttl:aspirin AND pdyear:2024", limit=2))
-    assert "match" in out and "2024" in out
+    assert "match" in out and "2024" in out and "US, EP, WO, JP and CN" in out
     err = run(S.surechembl_search_patents("ttl:", limit=2))
     assert err.startswith("Error:") and "\n" not in err.strip()  # trimmed to Solr's first line
     assert run(S.surechembl_search_patents("", 5)).startswith("Error: query is required")
@@ -74,5 +75,7 @@ def test_search_patents_solr_and_errors():
 def test_structure_search_modes_and_guard():
     out = run(S.surechembl_structure_search("CC(=O)Oc1ccccc1C(=O)O", "similarity", 3))
     assert "similarity hit(s)" in out and "similarity 1.00" in out
+    assert "C9H8O4" in out  # full records, not bare ids
+    assert run(S.surechembl_structure_search("C1CC(((", "identical", 3)).startswith("Error:")
     assert run(S.surechembl_structure_search("C", "substructure", 3)).startswith("Error: substructure query")
     assert run(S.surechembl_structure_search("CCO", "fuzzy", 3)).startswith("Error: mode must be")
