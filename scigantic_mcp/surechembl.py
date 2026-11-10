@@ -2,7 +2,9 @@
 
 Thin async wrappers over the scigantic-surechembl library (its pacing,
 retries, cache and hedged UniChem lookups are the reason to depend on it
-rather than call the REST API here). The library is synchronous, so each
+rather than call the REST API here). Needs scigantic-surechembl 0.4 or
+later, the port to SureChEMBL's late-2026 API; names resolve through its
+`names` extra (PubChem), since SureChEMBL no longer has a name lookup. The library is synchronous, so each
 call runs in a worker thread. Kept free of any `mcp` import so the tests
 can exercise it directly, the same as tools.py.
 
@@ -80,7 +82,8 @@ async def _resolve_ids(identifier: str) -> tuple[list[int], str]:
     SureChEMBL id; `CHEMBL25` as ChEMBL; `pubchem:2244`/`cid:2244` as a
     PubChem CID; `drugbank:DB00945`, `chebi:...`, `pdb:...` via UniChem;
     a standard InChIKey; then SMILES or a name, whichever the string
-    looks more like, with the other as fallback."""
+    looks more like, with the other as fallback. A name is resolved by
+    PubChem to a structure, then by UniChem to SureChEMBL ids."""
     raw = identifier.strip()
     if not raw:
         return [], "empty identifier"
@@ -105,10 +108,10 @@ async def _resolve_ids(identifier: str) -> tuple[list[int], str]:
         if c is not None:
             return [c.id], f"SMILES {raw}"
         found = await _run(sc.by_name, raw)
-        return [c.id for c in found], f"name {raw!r} (not a known SMILES)"
+        return [c.id for c in found], f"name {raw!r} via PubChem (not a known SMILES)"
     found = await _run(sc.by_name, raw)
     if found:
-        return [c.id for c in found], f"name {raw!r}"
+        return [c.id for c in found], f"name {raw!r} via PubChem"
     if _SMILES_CHARS_RE.match(raw):
         c = await _run(sc.by_smiles, raw)
         if c is not None:
@@ -204,8 +207,17 @@ async def surechembl_patent(doc_id: str, include_text: bool = False) -> str:
         f"Applicants: {', '.join(p.applicants) or 'n/a'}",
         f"Inventors: {', '.join(p.inventors) or 'n/a'}",
         f"Assignees: {', '.join(p.assignees) or 'n/a'}",
-        f"CPC: {', '.join(p.cpc[:12]) or 'n/a'}" + (" ..." if len(p.cpc) > 12 else ""),
-        f"Extracted compounds: {n_compounds if n_compounds >= 0 else 'unknown'}   Citations: {len(p.citations)}   Legal events: {len(p.legal_events)}",
+    ]
+    # SureChEMBL's late-2026 API returns no CPC codes, citations or legal
+    # events with a document, so those lines are only shown when present.
+    if p.cpc:
+        lines.append(f"CPC: {', '.join(p.cpc[:12])}" + (" ..." if len(p.cpc) > 12 else ""))
+    if p.ipcr:
+        lines.append(f"IPC: {', '.join(p.ipcr[:12])}" + (" ..." if len(p.ipcr) > 12 else ""))
+    if p.priority_numbers:
+        lines.append(f"Priority: {', '.join(p.priority_numbers[:8])}" + (" ..." if len(p.priority_numbers) > 8 else ""))
+    lines += [
+        f"Compounds named in the text: {n_compounds if n_compounds >= 0 else 'unknown'}",
         f"URL: {p.url}" + (f"   PDF: {p.pdf_url}" if p.pdf_url else ""),
         "",
         "Abstract: " + (p.abstract or "n/a"),
@@ -218,7 +230,7 @@ async def surechembl_patent(doc_id: str, include_text: bool = False) -> str:
             "\nCall again with include_text=true for the claims and description "
             f"({len(p.claims or ''):,} and {len(p.description or ''):,} characters)."
         )
-    lines.append("Next: surechembl_patent_chemistry(doc_id) for the extracted structures.")
+    lines.append("Next: surechembl_patent_chemistry(doc_id) for the compounds named in it.")
     return "\n".join(lines)
 
 
@@ -235,8 +247,11 @@ async def surechembl_patent_chemistry(doc_id: str, limit: int = 50) -> str:
     except (ValueError, SureChEMBLError) as exc:
         return f"Error: {exc}"
     if not compounds:
-        return f"SureChEMBL extracted no chemistry from {sc.patent_number(doc_id)} (or has no such document)."
-    lines = [f"{len(compounds):,} compound(s) extracted from {sc.patent_number(doc_id)}; showing {min(limit, len(compounds))}.\n"]
+        return f"SureChEMBL found no compounds named in the text of {sc.patent_number(doc_id)} (or has no such document)."
+    lines = [
+        f"{len(compounds):,} compound(s) named in the text of {sc.patent_number(doc_id)}; showing {min(limit, len(compounds))}. "
+        "Structures shown only in images or attachments are not included.\n"
+    ]
     lines.extend(_compound_line(c) for c in compounds[:limit])
     if len(compounds) > limit:
         lines.append(f"\n... {len(compounds) - limit:,} more. Raise limit (max 500).")
@@ -257,7 +272,7 @@ async def surechembl_search_patents(query: str, limit: int = 20) -> str:
         return f"Error: {str(exc).splitlines()[0]}"
     if not hits:
         return f'No patents matched "{query}".'
-    lines = [f'{total:,} patent(s) match "{query}"; showing {len(hits)}.\n']
+    lines = [f'{total:,} patent(s) match "{query}" (SureChEMBL searches US, EP, WO, JP and CN publications); showing {len(hits)}.\n']
     lines.extend(_hit_line(h) for h in hits)
     lines.append("\nNext: surechembl_patent(doc_id) for a document; surechembl_patent_chemistry(doc_id) for its structures.")
     return "\n".join(lines)

@@ -33,12 +33,17 @@ backed by [SureChEMBL](https://www.surechembl.org/) (EMBL-EBI, 31M compounds
 extracted from 45M patents) through the
 [scigantic-surechembl](https://github.com/Scigantic/scigantic-surechembl)
 library: look a compound up by any identifier, list the patents that mention
-it, read a patent, list the structures it discloses, search patents with Solr
+it, read a patent, list the compounds named in it, search patents with Solr
 syntax, and run structure searches. Also public, read-only, no key.
 
-> **Known issue (November 2026):** SureChEMBL changed its public API, and the
-> six `surechembl_*` tools currently return 404 or 405 errors. The catalog tools
-> are unaffected. A fix will follow in a later release.
+SureChEMBL replaced its REST API in November 2026. Since 0.3.2 these tools run
+on scigantic-surechembl 0.4, the port to the new API. Three things the new API
+no longer offers show up in the output: a patent's CPC codes, citations and
+legal events are not returned; `surechembl_patent_chemistry` lists the compounds
+named in a patent's text, not those that appear only in images or attachments;
+and full-text search and patent families cover US, EP, WO, JP and CN
+publications only. A chemical name is now resolved through PubChem, since
+SureChEMBL has no name lookup any more.
 
 Requires Python 3.10+ and MCP SDK 2.x.
 
@@ -67,9 +72,9 @@ Requires Python 3.10+ and MCP SDK 2.x.
 |------|--------------|
 | `surechembl_compound(identifier)` | A compound by SureChEMBL id, ChEMBL id, `pubchem:CID`, `drugbank:ID`, InChIKey, SMILES or name: structure, properties, cross-references, patent count. |
 | `surechembl_patents_for_compound(identifier, limit?)` | The patents in which the compound was found, with the total. |
-| `surechembl_patent(doc_id, include_text?)` | A patent's bibliography, abstract, family, CPC codes, extracted-compound count, and optionally its claims and description. |
-| `surechembl_patent_chemistry(doc_id, limit?)` | Every structure SureChEMBL extracted from the patent. |
-| `surechembl_search_patents(query, limit?)` | Full-text patent search with Solr field syntax (`ttl:`, `asg:`, `pdyear:`, `cpc:`, ...). |
+| `surechembl_patent(doc_id, include_text?)` | A patent's bibliography, abstract, family, priority claims, count of compounds named in the text, and optionally its claims and description. |
+| `surechembl_patent_chemistry(doc_id, limit?)` | The compounds SureChEMBL's text-mining finds named in the patent. |
+| `surechembl_search_patents(query, limit?)` | Full-text patent search with Solr field syntax (`ttl:`, `asg:`, `pdyear:`, `cpc:`, ...) over US, EP, WO, JP and CN publications. |
 | `surechembl_structure_search(structure, mode?, limit?)` | Similarity, substructure, identical or connectivity search over 31M compounds. |
 
 Identifiers are preserved verbatim in the output (SureChEMBL's attribution terms
