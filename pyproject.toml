@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT-0" }
 authors = [{ name = "Scigantic" }]
-keywords = ["mcp", "model-context-protocol", "datasets", "open-data", "schema-card", "bioinformatics", "earth-observation", "surechembl", "patents", "cheminformatics"]
+keywords = ["mcp", "model-context-protocol", "datasets", "open-data", "schema-card", "bioinformatics", "earth-observation", "surechembl", "patents", "cheminformatics", "mcp-server"]
 classifiers = [
   "License :: OSI Approved :: MIT No Attribution License (MIT-0)",
   "Programming Language :: Python :: 3",
@@ -22,6 +22,7 @@ classifiers = [
   "Typing :: Typed",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering",
+  "Development Status :: 4 - Beta",
 ]
 
 # mcp 2.0 removed `mcp.server.fastmcp`, so an open-ended floor silently installs
