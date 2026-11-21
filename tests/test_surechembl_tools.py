@@ -6,8 +6,11 @@ asyncio.run(), like test_tools.py.
 """
 
 import asyncio
+import re
 import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -16,6 +19,13 @@ from scigantic_mcp import surechembl as S  # noqa: E402
 
 def run(coro):
     return asyncio.run(coro)
+
+
+def _skip_if_upstream_down(out):
+    # A 5xx or a request that never got a response is SureChEMBL's outage,
+    # not a bug in the tool layer.
+    if re.match(r"Error: SureChEMBL (5\d\d for|request failed after)", out):
+        pytest.skip(out.splitlines()[0][:200])
 
 
 def test_compound_by_every_identifier_form_resolves_to_aspirin():
@@ -55,6 +65,7 @@ def test_patent_document_and_text_toggle():
 
 def test_patent_chemistry_lists_and_truncates():
     out = run(S.surechembl_patent_chemistry("US-5399578-A", limit=3))
+    _skip_if_upstream_down(out)
     head = out.splitlines()[0]
     n = int(head.split()[0].replace(",", ""))
     assert n > 300 and "named in the text of US-5399578-A" in head
