@@ -20,7 +20,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes
 It is built to drop into **[Kiro for Life Sciences](https://github.com/aws-samples/sample-kiro-power-life-sciences)**
 alongside its domain database servers. Where each Kiro server wraps one domain's
 APIs (genomics, proteomics, structural, …), Scigantic is the **cross-domain
-launchpad**: about 6,900 curated public archives spanning every domain, each with an
+launchpad**: more than 8,000 curated public archives spanning every domain, each with an
 LLM-ready **schema card** (file format, columns, sample rows/headers, inlined
 READMEs/data dictionaries, and a copy-paste starter cell) so an agent can
 understand a dataset's structure *before* downloading anything.
