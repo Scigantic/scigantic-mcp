@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: scigantic-mcp
+abstract: "MCP server for the Scigantic catalog of public scientific data archives, with schema cards for LLM agents and SureChEMBL patent chemistry tools."
+authors:
+  - name: Scigantic
+    website: https://scigantic.com
+repository-code: https://github.com/Scigantic/scigantic-mcp
+url: https://pypi.org/project/scigantic-mcp/
+license: MIT-0
+keywords:
+  - "mcp"
+  - "model-context-protocol"
+  - "datasets"
+  - "open-data"
+  - "schema-card"
+  - "bioinformatics"
+  - "earth-observation"
+  - "surechembl"
+version: "0.3.2"
+date-released: '2026-11-10'
