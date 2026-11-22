@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3
+
+Metadata only; no tool, argument or prompt changed.
+
+- README: the catalog holds more than 8,000 archives (it said about 6,900).
+- PyPI classifiers and keywords added (Development Status, `mcp-server`).
+- `server.json` description now mentions the SureChEMBL patent tools.
+
 ## 0.3.2
 
 The six `surechembl_*` tools work again. SureChEMBL replaced its REST API
