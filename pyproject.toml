@@ -39,6 +39,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://scigantic.com"
+"Dataset catalog" = "https://scigantic.com/explore?utm_source=pypi&utm_medium=project-urls&utm_campaign=scigantic-mcp"
 Repository = "https://github.com/Scigantic/scigantic-mcp"
 Documentation = "https://scigantic.com/blog/scigantic-mcp-server"
 Issues = "https://github.com/Scigantic/scigantic-mcp/issues"

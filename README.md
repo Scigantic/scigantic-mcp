@@ -14,19 +14,66 @@
 <!-- mcp-name: io.github.Scigantic/scigantic-mcp -->
 <!-- mcp-name: com.scigantic/mcp -->
 
-A [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the
-**Scigantic catalog of public scientific data archives** to any MCP client.
+An MCP server for finding public scientific datasets. It lets an AI assistant
+search the [Scigantic catalog](https://scigantic.com/explore?utm_source=github&utm_medium=readme&utm_campaign=scigantic-mcp)
+of more than 8,000 open data archives (genomics, cryo-EM and structural
+biology, neuroimaging, chemistry, earth observation, climate) and read how a
+dataset is laid out before downloading any of it. Each archive has a schema
+card: file formats, columns, sample rows or decoded file headers, the dataset's
+own README and data dictionary, and a starter code cell. Every tool calls
+public, read-only endpoints, so there is no account and no API key.
 
-It is built to drop into **[Kiro for Life Sciences](https://github.com/aws-samples/sample-kiro-power-life-sciences)**
+If your client speaks HTTP, there is nothing to install. Add the hosted server:
+
+```
+https://api.scigantic.com/mcp
+```
+
+If your client launches stdio servers, run this package:
+
+```json
+{
+  "mcpServers": {
+    "scigantic": { "command": "uvx", "args": ["scigantic-mcp"] }
+  }
+}
+```
+
+Then ask for data in plain words. `search_archives("EMPIAR cryo-EM raw micrographs", limit=3)`
+returns:
+
+```
+Found 3 archive(s) for "EMPIAR cryo-EM raw micrographs":
+
+1. EMPIAR: Electron Microscopy Public Image Archive  [id: e3d9a7c0-1f2b-4a6d-9c8e-2b7f4a1c6e05]
+   Structural Biology · api
+   EMPIAR is EMBL-EBI's public archive of raw cryo-EM, cryo-ET, and volume-EM image datasets underpinning 3D structures in EMDB and PDB.
+   source: https://www.ebi.ac.uk/empiar/
+...
+```
+
+`get_schema_card(id)` then describes the files, and `get_data_access(id)` gives
+the storage location and code to read it in your own environment.
+
+## Try it on hosted data
+
+An archive's page on scigantic.com opens the dataset in a hosted Jupyter
+notebook with the data mounted read-only, so nothing is downloaded first. Two
+examples:
+[EMPIAR](https://scigantic.com/archive/e3d9a7c0-1f2b-4a6d-9c8e-2b7f4a1c6e05?utm_source=github&utm_medium=readme&utm_campaign=scigantic-mcp)
+and [ChEMBL 37](https://scigantic.com/archive/97a98fc5-e6f9-555c-a22f-f2b548775f14?utm_source=github&utm_medium=readme&utm_campaign=scigantic-mcp).
+A longer walkthrough of the server is in
+[Use the Scigantic catalog from your AI agent with MCP](https://scigantic.com/blog/scigantic-mcp-server?utm_source=github&utm_medium=readme&utm_campaign=scigantic-mcp).
+
+## Kiro for Life Sciences
+
+The stdio package is built to drop into **[Kiro for Life Sciences](https://github.com/aws-samples/sample-kiro-power-life-sciences)**
 alongside its domain database servers. Where each Kiro server wraps one domain's
-APIs (genomics, proteomics, structural, …), Scigantic is the **cross-domain
-launchpad**: more than 8,000 curated public archives spanning every domain, each with an
-LLM-ready **schema card** (file format, columns, sample rows/headers, inlined
-READMEs/data dictionaries, and a copy-paste starter cell) so an agent can
-understand a dataset's structure *before* downloading anything.
+APIs (genomics, proteomics, structural, …), Scigantic covers every domain in
+one catalog, so an agent can find a dataset and understand its structure
+before it picks a domain tool.
 
-It is **discovery-only and zero-config** — every tool calls public, read-only
-Scigantic endpoints, so there is no API key to set up.
+## Patent chemistry
 
 Since 0.3.0 it also carries six `surechembl_*` tools for **patent chemistry**,
 backed by [SureChEMBL](https://www.surechembl.org/) (EMBL-EBI, 31M compounds
