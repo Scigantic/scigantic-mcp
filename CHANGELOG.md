@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+- README opens with what the package reads, adds a runnable example near the top and links the matching dataset pages. Project URLs and classifiers updated. No code changes.
+
 ## 0.3.2
 
 The six `surechembl_*` tools work again. SureChEMBL replaced its REST API

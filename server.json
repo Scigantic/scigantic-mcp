@@ -15,13 +15,13 @@
       "sizes": ["any"]
     }
   ],
-  "version": "0.3.2",
+  "version": "0.3.3",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "scigantic-mcp",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
